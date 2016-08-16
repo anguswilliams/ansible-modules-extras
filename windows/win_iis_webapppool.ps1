@@ -109,7 +109,7 @@ try {
       Set-ItemProperty ("IIS:\AppPools\" + $name) processModel.userName $username
     }
 
-    if ($currentUser -ne $password) {
+    if ($currentPass -ne $password) {
       $result.changed = $true
       Set-ItemProperty ("IIS:\AppPools\" + $name) processModel.password $password
     }
