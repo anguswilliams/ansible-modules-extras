@@ -105,10 +105,12 @@ try {
     }
 
     if ($currentUser -ne $username) {
+      $result.changed = $true
       Set-ItemProperty ("IIS:\AppPools\" + $name) processModel.userName $username
     }
 
     if ($currentUser -ne $password) {
+      $result.changed = $true
       Set-ItemProperty ("IIS:\AppPools\" + $name) processModel.password $password
     }
   }
