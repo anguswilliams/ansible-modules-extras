@@ -56,12 +56,14 @@ options:
     required: false
     default: null
     aliases: []
+    version_added: 2.2
   password:
     description:
       - Password to run AppPool as.
     required: false
     default: null
     aliases: []
+    version_added: 2.2
 author: Henrik Wallström
 '''
 
