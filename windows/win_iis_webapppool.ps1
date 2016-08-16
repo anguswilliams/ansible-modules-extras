@@ -46,6 +46,12 @@ If (Get-Member -InputObject $params -Name attributes) {
   }
 }
 
+$username = Get-Attr $params "username" $null
+$password = Get-Attr $params "password" $null
+if (($username -ne $null) -and ($password -eq $null)) {
+    Fail-Json (New-Object psobject) "The 'password' argument must be specified when specifying username"
+}
+
 # Ensure WebAdministration module is loaded
 if ((Get-Module "WebAdministration" -ErrorAction SilentlyContinue) -eq $NULL){
   Import-Module WebAdministration
@@ -85,6 +91,28 @@ try {
       }
     }
 
+  # Run AppPool as specific user
+  if ($username -ne $null) {
+    $specificUserId = 3
+    $currentUser = Get-ItemProperty ("IIS:\AppPools\" + $name) processModel.userName
+    $currentPass = Get-ItemProperty ("IIS:\AppPools\" + $name) processModel.password
+    $currentIdentityType = Get-ItemProperty ("IIS:\AppPools\" + $name) processModel.identityType
+
+    # identityType needs to be set to SpecificUser
+    if ($currentIdentityType -ne 'SpecificUser') {
+      $result.changed = $true
+      Set-ItemProperty ("IIS:\AppPools\" + $name) processModel.identityType $specificUserId
+    }
+
+    if ($currentUser -ne $username) {
+      Set-ItemProperty ("IIS:\AppPools\" + $name) processModel.userName $username
+    }
+
+    if ($currentUser -ne $password) {
+      Set-ItemProperty ("IIS:\AppPools\" + $name) processModel.password $password
+    }
+  }
+
     # Set run state
     if (($state -eq 'stopped') -and ($pool.State -eq 'Started')) {
       Stop-WebAppPool -Name $name -ErrorAction Stop
@@ -96,11 +124,11 @@ try {
     }
     if ($state -eq 'restarted') {
       switch ($pool.State)
-        { 
+        {
           'Stopped' { Start-WebAppPool -Name $name -ErrorAction Stop }
           default { Restart-WebAppPool -Name $name -ErrorAction Stop }
         }
-      $result.changed = $TRUE   
+      $result.changed = $TRUE
     }
   }
 } catch {
@@ -116,7 +144,7 @@ if ($pool)
     state = $pool.State
     attributes =  New-Object psobject @{}
   };
-  
+
   $pool.Attributes | ForEach { $result.info.attributes.Add($_.Name, $_.Value)};
 }
 

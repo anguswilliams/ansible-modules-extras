@@ -50,6 +50,18 @@ options:
     required: false
     default: null
     aliases: []
+  username:
+    description:
+      - Username to run AppPool as.
+    required: false
+    default: null
+    aliases: []
+  password:
+    description:
+      - Password to run AppPool as.
+    required: false
+    default: null
+    aliases: []
 author: Henrik Wallström
 '''
 
@@ -98,6 +110,8 @@ $  ansible -i inventory -m win_iis_webapppool -a "name='AppPool' attributes='man
 # This creates an application pool and sets attributes
 $  ansible -i inventory -m win_iis_webapppool -a "name='AnotherAppPool' state=started attributes='managedRuntimeVersion:v4.0|autoStart:false'" windows
 
+# This creates a pool using the specified credentials
+$  ansible -i inventory -m win_iis_webapppool -a "name='AnotherAppPool' state=started username='mydomain\\myuser' password='mypassword'" windows
 
 # Playbook example
 ---
@@ -109,4 +123,12 @@ $  ansible -i inventory -m win_iis_webapppool -a "name='AnotherAppPool' state=st
     attributes: managedRuntimeVersion:v4.0
   register: webapppool
 
+- name: App Pool running under specific identity
+  win_iis_webapppool:
+    name: 'AppPool'
+    state: started
+    attributes: managedRuntimeVersion:v4.0
+    username: mydomain\\myuser
+    password: mypassword
+  register: webapppool
 '''
