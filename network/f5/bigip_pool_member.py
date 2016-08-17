@@ -407,8 +407,7 @@ def main():
         description=dict(type='str'),
         rate_limit=dict(type='int'),
         ratio=dict(type='int'),
-        preserve_node=dict(type='bool', default=False),
-        server_port=dict(type='int', default=443)
+        preserve_node=dict(type='bool', default=False)
     )
     argument_spec.update(meta_args)
 
