@@ -407,7 +407,8 @@ def main():
         description=dict(type='str'),
         rate_limit=dict(type='int'),
         ratio=dict(type='int'),
-        preserve_node=dict(type='bool', default=False)
+        preserve_node=dict(type='bool', default=False),
+        server_port=dict(type='int', default=443)
     )
     argument_spec.update(meta_args)
 
@@ -506,7 +507,7 @@ def main():
                         if not module.check_mode:
                             set_member_session_enabled_state(api, pool, address, port, session_state)
                         result = {'changed': True}
-                    elif session_state == 'disabled' and session_status != 'force_disabled':
+                    elif session_state == 'disabled' and session_status != 'forced_disabled':
                         if not module.check_mode:
                             set_member_session_enabled_state(api, pool, address, port, session_state)
                         result = {'changed': True}
